@@ -1,8 +1,8 @@
 # AI Research Assistant
 
-Начальный каркас API-сервиса для AI Research Assistant. Приложение пока находится в разработке.
+Starter scaffold for the AI Research Assistant API. The application is still under development.
 
-## Установка
+## Setup
 
 ```powershell
 python -m venv .venv
@@ -10,11 +10,11 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Структура
+## Project Structure
 
-- `app/` — код приложения: точка входа, работа с базой данных, модели и схемы.
-- `app/routers/` — API-маршруты.
-- `app/services/` — бизнес-логика.
-- `tests/` — тесты.
+- `app/` — application code, including the entry point, database, models, and schemas.
+- `app/routers/` — API routes.
+- `app/services/` — business logic.
+- `tests/` — tests.
 
-Для запуска приложения потребуется реализовать ASGI-приложение в `app/main.py`.
+An ASGI application must be implemented in `app/main.py` before the project can be run.
