@@ -17,12 +17,12 @@ class ArticleResponse(BaseModel):
     title: str
     url: HttpUrl
     category: str
-    notes: str | None 
+    notes: str | None = None
 
 # Update Article
 class ArticleUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=100)
-    url: HttpUrl | None
+    url: HttpUrl | None = None
     category: str | None = Field(default=None, min_length=3, max_length=30)
     notes: str | None = Field(
         default=None,
