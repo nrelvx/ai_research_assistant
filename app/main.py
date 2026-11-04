@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import uvicorn
 import schemas
 
@@ -17,10 +17,45 @@ async def get_articles():
     return articles
 
 # Create Article
-@app.post("/articles", tags=["Articles"])
+@app.post("/articles", response_model=schemas.ArticleResponse, tags=["Articles"])
 async def create_article(article: schemas.ArticleCreate):
-    articles.append(article)
-    return article
+    global next_id
+    
+    new_article = schemas.ArticleResponse(
+        id=next_id,
+        **article.model_dump()
+    )
+    next_id += 1
+
+    articles.append(new_article)
+    return new_article
+
+# Update Article
+@app.patch("/articles/{article_id}", tags=["Articles"])
+async def update_article(article_id: int, article_update: schemas.ArticleUpdate):
+    # Search for the article by ID
+    for art in articles:
+        if art.id == article_id:
+
+            # Get only the fields that were provided in the request body
+            update_data = article_update.model_dump(exclude_unset=True)
+
+            # Update the article with the provided fields
+            for key, value in update_data.items():
+                setattr(art, key, value)
+            return art
+    raise HTTPException(status_code=404, detail="Article not found")
+
+# Delete Article
+@app.delete("/articles/{article_id}", tags=["Articles"])
+async def delete_article(article_id: int):
+
+    for art in articles:
+        if art.id == article_id:
+            articles.remove(art)
+            return {"message": "Article deleted successfully"}
+
+    raise HTTPException(status_code=404, detail="Article not found")
 
 
 if __name__ == "__main__":
