@@ -30,10 +30,17 @@ async def get_articles(db: Session = Depends(get_db)):
 # Create Article
 @app.post("/articles", response_model=schemas.ArticleResponse)
 async def create_article(article: schemas.ArticleCreate, db: Session = Depends(get_db)):
-    db_article = models.Article(**article.model_dump())
+    db_article = models.Article(
+        title=article.title,
+        url=str(article.url),
+        category=article.category,
+        notes=article.notes
+    )
+
     db.add(db_article)
     db.commit()
     db.refresh(db_article)
+
     return db_article
 
 # Update Article
@@ -44,6 +51,10 @@ async def update_article(article_id: int, article_update: schemas.ArticleUpdate,
         raise HTTPException(status_code=404, detail="Article not found")
 
     update_data = article_update.model_dump(exclude_unset=True)
+    # Convert HttpUrl to string if present
+    if "url" in update_data and update_data["url"] is not None:
+        update_data["url"] = str(update_data["url"])
+
     for key, value in update_data.items():
         setattr(db_article, key, value)
 
@@ -52,7 +63,7 @@ async def update_article(article_id: int, article_update: schemas.ArticleUpdate,
     return db_article
 
 # Delete Article
-@app.delete("/articles/{article_id}", response_model=schemas.ArticleResponse)
+@app.delete("/articles/{article_id}")
 async def delete_article(article_id: int, db: Session = Depends(get_db)):
     db_article = db.query(models.Article).filter(models.Article.id == article_id).first()
     if not db_article:
@@ -60,7 +71,7 @@ async def delete_article(article_id: int, db: Session = Depends(get_db)):
 
     db.delete(db_article)
     db.commit()
-    return {"message": "Article deleted successfully"}
+    return db_article
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", reload=True)
