@@ -27,6 +27,14 @@ async def get_articles(db: Session = Depends(get_db)):
     articles = db.query(models.Article).all()
     return articles
 
+# Article by ID
+@app.get("/articles/{article_id}", response_model=schemas.ArticleResponse, tags=["Articles"])
+async def get_article(article_id: int, db: Session = Depends(get_db)):
+    article = db.query(models.Article).filter(models.Article.id == article_id).first()
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return article
+
 # Create Article
 @app.post("/articles", response_model=schemas.ArticleResponse)
 async def create_article(article: schemas.ArticleCreate, db: Session = Depends(get_db)):
