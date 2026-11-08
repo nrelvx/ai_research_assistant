@@ -1,9 +1,20 @@
 from fastapi import FastAPI, HTTPException
 import uvicorn
 import schemas
+import models
+from db import SessionLocal, engine
+from sqlalchemy.orm import Session
 
-app = FastAPI()
-articles = []
+models.Base.metadata.create_all(bind=engine)
+app = FastAPI(title="AI Assistant", description="An AI assistant for research and article management.", version="1.0.0")
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        
 next_id = 1
 
 # Home page
